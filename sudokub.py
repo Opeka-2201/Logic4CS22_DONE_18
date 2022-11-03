@@ -11,6 +11,7 @@ import subprocess
 # | | |2| |
 # | |2| | |
 # spaces and empty lines are ignored
+
 def sudoku_read(filename):
     myfile = open(filename, 'r')
     sudoku = []
@@ -52,8 +53,11 @@ def sudoku_print(myfile, sudoku):
 # get number of constraints for sudoku
 def sudoku_constraints_number(sudoku):
     N = len(sudoku)
-    # Here generate the number of constraints
-    count = 0
+    count = 4 * N * N * ( 1 + N * (N - 1) / 2)
+    for line in sudoku:
+        for number in line:
+            if number > 0:
+                count += 1
     return count
 
 # prints the generic constraints for sudoku of size N
@@ -84,9 +88,6 @@ def sudoku_generic_constraints(myfile, N):
     else:
         exit("Only supports size 4, 9, 16 and 25")
 
-    # Here should come the constraint generation
-    # ...
-
 
 def sudoku_specific_constraints(myfile, sudoku):
 
@@ -99,6 +100,9 @@ def sudoku_specific_constraints(myfile, sudoku):
     def newlit(i,j,k):
         output(str(i)+str(j)+str(k)+ " ")
 
+    def newneglit(i,j,k):
+        output("-"+str(i)+str(j)+str(k)+ " ")
+
     def newcl():
         output("0\n")
 
@@ -108,24 +112,59 @@ def sudoku_specific_constraints(myfile, sudoku):
                 newlit(i + 1, j + 1, sudoku[i][j])
                 newcl()
 
+    if N == 4:
+        n = 2
+    elif N == 9:
+        n = 3
+    elif N == 16:
+        n = 4
+    elif N == 25:
+        n = 5
+    else:
+        exit("Only supports size 4, 9, 16 and 25")
+
+    # each cell contains a number
+    for i in range(1, N+1):
+        for j in range(1, N+1):   
+            for number in range(1, N+1):
+                newlit(i, j, number)
+            newcl()
+
+    # each cell contains at most one number
+    for i in range(1, N+1):
+        for j in range(1, N+1):
+            for number in range(1, N+1):
+                for number2 in range(number + 1, N+1):
+                    newneglit(i, j, number)
+                    newneglit(i, j, number2)
+                    newcl()
+
+    # each line contains every number once
+    for i in range(1, N+1):
+        for number in range(1, N+1):
+            for j in range(1, N+1):
+                newlit(i, j, number)
+            newcl()
+
+    # each column contains every number once
+    for j in range(1, N+1):
+        for number in range(1, N+1):
+            for i in range(1, N+1):
+                newlit(i, j, number)
+            newcl()
+
+    # each block contains every number once
+    for i in range(1, N+1, n):
+        for j in range(1, N+1, n):
+            for number in range(1, N+1):
+                for k in range(0, n):
+                    for l in range(0, n):
+                        newlit(i + k, j + l, number)
+                newcl()
+
 def sudoku_other_solution_constraint(myfile, sudoku):
+    pass
 
-    N = len(sudoku)
-
-    def output(s):
-        myfile.write(s)
-
-    # Notice that the following function only works for N = 4 or N = 9
-    def newlit(i,j,k):
-        output(str(i)+str(j)+str(k)+ " ")
-
-    def newcl():
-        output("0\n")
-
-    # Here should come the constraint generation
-    # ...
-    newcl()
-                
 def sudoku_solve(filename):
     command = "java -jar org.sat4j.core.jar sudoku.cnf"
     process = subprocess.Popen(command, shell=True,
