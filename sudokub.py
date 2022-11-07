@@ -2,6 +2,8 @@
 
 import sys
 import subprocess
+from random import random
+from random import shuffle
 
 # reads a sudoku from file
 # columns are separated by |, lines by newlines
@@ -66,9 +68,12 @@ def sudoku_generic_constraints(myfile, N):
     def output(s):
         myfile.write(s)
 
-    # Notice that the following function only works for N = 4 or N = 9
+    # Notice that the following function only works for N = 4 or N = 9 --> fixed
     def newlit(i,j,k):
-        output(str(i)+str(j)+str(k)+ " ")
+        output(str(i).zfill(2)+str(j).zfill(2)+str(k).zfill(2)+ " ")
+
+    def newneglit(i,j,k):
+        output("-"+str(i).zfill(2)+str(j).zfill(2)+str(k).zfill(2)+ " ")
 
     def newcl():
         output("0\n")
@@ -76,41 +81,6 @@ def sudoku_generic_constraints(myfile, N):
     def newcomment(s):
 #        output("c %s\n"%s)
         output("")
-
-    if N == 4:
-        n = 2
-    elif N == 9:
-        n = 3
-    elif N == 16:
-        n = 4
-    elif N == 25:
-        n = 5
-    else:
-        exit("Only supports size 4, 9, 16 and 25")
-
-
-def sudoku_specific_constraints(myfile, sudoku):
-
-    N = len(sudoku)
-
-    def output(s):
-        myfile.write(s)
-
-    # Notice that the following function only works for N = 4 or N = 9
-    def newlit(i,j,k):
-        output(str(i)+str(j)+str(k)+ " ")
-
-    def newneglit(i,j,k):
-        output("-"+str(i)+str(j)+str(k)+ " ")
-
-    def newcl():
-        output("0\n")
-
-    for i in range(N):
-        for j in range(N):
-            if sudoku[i][j] > 0:
-                newlit(i + 1, j + 1, sudoku[i][j])
-                newcl()
 
     if N == 4:
         n = 2
@@ -162,6 +132,29 @@ def sudoku_specific_constraints(myfile, sudoku):
                         newlit(i + k, j + l, number)
                 newcl()
 
+      
+
+
+def sudoku_specific_constraints(myfile, sudoku):
+
+    N = len(sudoku)
+
+    def output(s):
+        myfile.write(s)
+
+    # Notice that the following function only works for N = 4 or N = 9 --> fixed
+    def newlit(i,j,k):
+        output(str(i).zfill(2)+str(j).zfill(2)+str(k).zfill(2)+ " ")
+
+    def newcl():
+        output("0\n")
+
+    for i in range(N):
+        for j in range(N):
+            if sudoku[i][j] > 0:
+                newlit(i + 1, j + 1, sudoku[i][j])
+                newcl()
+
 def sudoku_other_solution_constraint(myfile, sudoku):
     pass
 
@@ -196,16 +189,20 @@ def sudoku_solve(filename):
             else:
                 exit("strange output from SAT solver:" + line + "\n")
             sudoku = [ [0 for i in range(N)] for j in range(N)]
-            # Notice that the following function only works for N = 4 or N = 9
+            # Notice that the following function only works for N = 4 or N = 9 --> fixed
             for number in units:
-                sudoku[number // 100 - 1][( number // 10 )% 10 - 1] = number % 10
+                a = number // 10000
+                i = a - 1
+                b = (number - a * 10000) // 100
+                j = b - 1
+                k = number - a * 10000 - b * 100
+                sudoku[i][j] = k              
             return sudoku
         exit("strange output from SAT solver:" + line + "\n")
         return []
 
 def sudoku_generate(size):
-    #TODO
-    return []
+  pass
     
 from enum import Enum
 class Mode(Enum):
@@ -237,7 +234,7 @@ if mode == Mode.SOLVE or mode == Mode.UNIQUE:
     N = len(sudoku)
     myfile = open("sudoku.cnf", 'w')
     # Notice that this may not be correct for N > 9
-    myfile.write("p cnf "+str(N)+str(N)+str(N)+" "+
+    myfile.write("p cnf "+ str(1_000_000)  +" "+
                  str(sudoku_constraints_number(sudoku))+"\n")
     sudoku_generic_constraints(myfile, N)
     sudoku_specific_constraints(myfile, sudoku)
