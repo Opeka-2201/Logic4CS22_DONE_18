@@ -3,7 +3,6 @@
 import sys
 import subprocess
 from random import random
-from random import shuffle
 
 # reads a sudoku from file
 # columns are separated by |, lines by newlines
@@ -79,7 +78,6 @@ def sudoku_generic_constraints(myfile, N):
         output("0\n")
 
     def newcomment(s):
-#        output("c %s\n"%s)
         output("")
 
     if N == 4:
@@ -132,9 +130,6 @@ def sudoku_generic_constraints(myfile, N):
                         newlit(i + k, j + l, number)
                 newcl()
 
-      
-
-
 def sudoku_specific_constraints(myfile, sudoku):
 
     N = len(sudoku)
@@ -156,7 +151,12 @@ def sudoku_specific_constraints(myfile, sudoku):
                 newcl()
 
 def sudoku_other_solution_constraint(myfile, sudoku):
-    pass
+    # simply add a constraint that forbids the current solution
+    for i in range(len(sudoku)):
+        for j in range(len(sudoku)):
+            if sudoku[i][j] > 0:
+                myfile.write("-" + str(i+1).zfill(2) + str(j+1).zfill(2) + str(sudoku[i][j]).zfill(2) + " ")
+    myfile.write("0\n")
 
 def sudoku_solve(filename):
     command = "java -jar org.sat4j.core.jar sudoku.cnf"
@@ -201,8 +201,69 @@ def sudoku_solve(filename):
         exit("strange output from SAT solver:" + line + "\n")
         return []
 
-def sudoku_generate(size):
-  pass
+def sudoku_generate(size, cm):
+    sudoku = [[0 for i in range(size)] for j in range(size)]
+
+    # generate a first batch of 9 clues that wont create a contradiction to create some kind of random seed for the SAT solver
+    for k in range(1,size+1):
+        i = int(random() * size)
+        j = int(random() * size)
+        sudoku[i][j] = k
+
+    # solve the sudoku with this kind of random seed
+    myfile = open("sudoku.cnf", "w")
+    myfile.write("p cnf "+ str(1_000_000)  +" "+
+                str(sudoku_constraints_number(sudoku))+"\n")
+    sudoku_generic_constraints(myfile, size)
+    sudoku_specific_constraints(myfile, sudoku)
+    myfile.close()
+
+    sudoku = sudoku_solve("sudoku.cnf")
+    sudoku_print(sys.stdout, sudoku)
+
+    if cm == True:
+        rand_rmv = int(random() * size) + 1
+        print("Removing " + str(rand_rmv) + " clues")
+        for i in range(len(sudoku)):
+            for j in range(len(sudoku)):
+                if sudoku[i][j] == rand_rmv:
+                    sudoku[i][j] = 0
+
+    # remove numbers from sudoku while it produces a unique solution
+    while True:
+        sudoku_print(sys.stdout, sudoku)
+        print(" ")
+        i = int(random() * size)
+        j = int(random() * size)
+        save = sudoku[i][j]
+        sudoku[i][j] = 0
+
+        # solve sudoku
+        myfile = open("sudoku.cnf", "w")
+        myfile.write("p cnf "+ str(1_000_000)  +" "+
+                    str(sudoku_constraints_number(sudoku))+"\n")
+        sudoku_generic_constraints(myfile, size)
+        sudoku_specific_constraints(myfile, sudoku)
+        myfile.close()
+
+        sudoku_temp = sudoku_solve(sudoku)
+
+        #check if sudoku_temp produces a unique solution
+
+        myfile = open("sudoku.cnf", "a")
+        sudoku_other_solution_constraint(myfile, sudoku_temp)
+        myfile.close()
+
+        sudoku_temp = sudoku_solve(sudoku)
+
+        if sudoku_temp == []:
+            continue
+        else:
+            print("Unique sudoku found")
+            sudoku[i][j] = save
+            break
+
+    return sudoku
     
 from enum import Enum
 class Mode(Enum):
@@ -256,11 +317,11 @@ if mode == Mode.SOLVE or mode == Mode.UNIQUE:
             sudoku_print(sys.stdout, sudoku)
 elif mode == Mode.CREATE:
     size = int(sys.argv[2])
-    sudoku = sudoku_generate(size)
+    sudoku = sudoku_generate(size, False)
     sys.stdout.write("\ngenerated sudoku\n")
     sudoku_print(sys.stdout, sudoku)
 elif mode == Mode.CREATEMIN:
     size = int(sys.argv[2])
-    sudoku = sudoku_generate(size)
+    sudoku = sudoku_generate(size, True)
     sys.stdout.write("\ngenerated sudoku\n")
     sudoku_print(sys.stdout, sudoku)
