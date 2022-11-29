@@ -68,11 +68,11 @@ def sudoku_generic_constraints(myfile, N):
         myfile.write(s)
 
     # Notice that the following function only works for N = 4 or N = 9 --> fixed
-    def newlit(i,j,k):
-        output(str(i).zfill(2)+str(j).zfill(2)+str(k).zfill(2)+ " ")
+    def newlit(i,j,k,N):
+        output(str(i*N+j) + str(k).zfill(2) + " ")
 
-    def newneglit(i,j,k):
-        output("-"+str(i).zfill(2)+str(j).zfill(2)+str(k).zfill(2)+ " ")
+    def newneglit(i,j,k,N):
+        output("-"+ str(i*N+j) + str(k).zfill(2) + " ")
 
     def newcl():
         output("0\n")
@@ -92,43 +92,73 @@ def sudoku_generic_constraints(myfile, N):
         exit("Only supports size 4, 9, 16 and 25")
 
     # each cell contains a number
-    for i in range(1, N+1):
-        for j in range(1, N+1):   
+    for i in range(0, N):
+        for j in range(0, N):   
             for number in range(1, N+1):
-                newlit(i, j, number)
+                newlit(i, j, number, N)
             newcl()
 
     # each cell contains at most one number
-    for i in range(1, N+1):
-        for j in range(1, N+1):
+    for i in range(0, N):
+        for j in range(0, N):
             for number in range(1, N+1):
                 for number2 in range(number + 1, N+1):
-                    newneglit(i, j, number)
-                    newneglit(i, j, number2)
+                    newneglit(i, j, number, N)
+                    newneglit(i, j, number2, N)
                     newcl()
 
     # each line contains every number once
-    for i in range(1, N+1):
+    for i in range(0, N):
         for number in range(1, N+1):
-            for j in range(1, N+1):
-                newlit(i, j, number)
+            for j in range(0, N):
+                newlit(i, j, number, N)
             newcl()
+
+    # for each line, each number appears at most once
+    for i in range(0, N):
+        for number in range(1, N+1):
+            for j in range(0, N):
+                for j2 in range(j + 1, N):
+                    newneglit(i, j, number, N)
+                    newneglit(i, j2, number, N)
+                    newcl()
 
     # each column contains every number once
-    for j in range(1, N+1):
+    for j in range(0, N):
         for number in range(1, N+1):
-            for i in range(1, N+1):
-                newlit(i, j, number)
+            for i in range(0, N):
+                newlit(i, j, number, N)
             newcl()
 
+    # for each column, each number appears at most once
+    for j in range(0, N):
+        for number in range(1, N+1):
+            for i in range(0, N):
+                for i2 in range(i + 1, N):
+                    newneglit(i, j, number, N)
+                    newneglit(i2, j, number, N)
+                    newcl()
+
     # each block contains every number once
-    for i in range(1, N+1, n):
-        for j in range(1, N+1, n):
+    for i in range(0, N, n):
+        for j in range(0, N, n):
             for number in range(1, N+1):
                 for k in range(0, n):
                     for l in range(0, n):
-                        newlit(i + k, j + l, number)
+                        newlit(i + k, j + l, number, N)
                 newcl()
+
+    # for each block, each number appears at most once
+    for i in range(0, N, n):
+        for j in range(0, N, n):
+            for number in range(1, N+1):
+                for k in range(0, n):
+                    for l in range(0, n):
+                        for k2 in range(k, n):
+                            for l2 in range(l + (k2 == k), n):
+                                newneglit(i + k, j + l, number, N)
+                                newneglit(i + k2, j + l2, number, N)
+                                newcl()
 
 def sudoku_specific_constraints(myfile, sudoku):
 
@@ -138,8 +168,8 @@ def sudoku_specific_constraints(myfile, sudoku):
         myfile.write(s)
 
     # Notice that the following function only works for N = 4 or N = 9 --> fixed
-    def newlit(i,j,k):
-        output(str(i).zfill(2)+str(j).zfill(2)+str(k).zfill(2)+ " ")
+    def newlit(i,j,k,N):
+        output(str(i*N+j) + str(k).zfill(2) + " ")
 
     def newcl():
         output("0\n")
@@ -147,7 +177,7 @@ def sudoku_specific_constraints(myfile, sudoku):
     for i in range(N):
         for j in range(N):
             if sudoku[i][j] > 0:
-                newlit(i + 1, j + 1, sudoku[i][j])
+                newlit(i, j, sudoku[i][j], N)
                 newcl()
 
 def sudoku_other_solution_constraint(myfile, sudoku):
@@ -155,7 +185,7 @@ def sudoku_other_solution_constraint(myfile, sudoku):
     for i in range(len(sudoku)):
         for j in range(len(sudoku)):
             if sudoku[i][j] > 0:
-                myfile.write("-" + str(i+1).zfill(2) + str(j+1).zfill(2) + str(sudoku[i][j]).zfill(2) + " ")
+                myfile.write("-" + str(i*len(sudoku)+j) + str(sudoku[i][j]).zfill(2) + " ")
     myfile.write("0\n")
 
 def sudoku_solve(filename):
@@ -191,12 +221,15 @@ def sudoku_solve(filename):
             sudoku = [ [0 for i in range(N)] for j in range(N)]
             # Notice that the following function only works for N = 4 or N = 9 --> fixed
             for number in units:
-                a = number // 10000
-                i = a - 1
-                b = (number - a * 10000) // 100
-                j = b - 1
-                k = number - a * 10000 - b * 100
-                sudoku[i][j] = k              
+                # isolate last two digits
+                value = number % 100
+                number = number // 100
+                # isolate last digit
+                j = number % N
+                number = number // N
+                # isolate first digit
+                i = number
+                sudoku[i][j] = value
             return sudoku
         exit("strange output from SAT solver:" + line + "\n")
         return []
@@ -212,7 +245,7 @@ def sudoku_generate(size, cm):
 
     # solve the sudoku with this kind of random seed
     myfile = open("sudoku.cnf", "w")
-    myfile.write("p cnf "+ str(1_000_000)  +" "+
+    myfile.write("p cnf "+ str(size*size) + str(size).zfill(2)  +" "+
                 str(sudoku_constraints_number(sudoku))+"\n")
     sudoku_generic_constraints(myfile, size)
     sudoku_specific_constraints(myfile, sudoku)
@@ -223,7 +256,7 @@ def sudoku_generate(size, cm):
 
     if cm == True:
         rand_rmv = int(random() * size) + 1
-        print("Removing " + str(rand_rmv) + " clues")
+        print("\nRemoving " + str(rand_rmv) + " clues\n")
         for i in range(len(sudoku)):
             for j in range(len(sudoku)):
                 if sudoku[i][j] == rand_rmv:
@@ -240,7 +273,7 @@ def sudoku_generate(size, cm):
 
         # solve sudoku
         myfile = open("sudoku.cnf", "w")
-        myfile.write("p cnf "+ str(1_000_000)  +" "+
+        myfile.write("p cnf "+ str(size*size) + str(size).zfill(2)  +" "+
                     str(sudoku_constraints_number(sudoku))+"\n")
         sudoku_generic_constraints(myfile, size)
         sudoku_specific_constraints(myfile, sudoku)
@@ -295,7 +328,7 @@ if mode == Mode.SOLVE or mode == Mode.UNIQUE:
     N = len(sudoku)
     myfile = open("sudoku.cnf", 'w')
     # Notice that this may not be correct for N > 9
-    myfile.write("p cnf "+ str(1_000_000)  +" "+
+    myfile.write("p cnf "+ str(N*N) + str(N).zfill(2)  +" "+
                  str(sudoku_constraints_number(sudoku))+"\n")
     sudoku_generic_constraints(myfile, N)
     sudoku_specific_constraints(myfile, sudoku)
@@ -320,8 +353,16 @@ elif mode == Mode.CREATE:
     sudoku = sudoku_generate(size, False)
     sys.stdout.write("\ngenerated sudoku\n")
     sudoku_print(sys.stdout, sudoku)
+    file = open("generated_sudoku.txt", "w")
+    sudoku_print(file, sudoku)
+    file.close()
+    print("\nSudoku saved in generated_sudoku.txt")
 elif mode == Mode.CREATEMIN:
     size = int(sys.argv[2])
     sudoku = sudoku_generate(size, True)
     sys.stdout.write("\ngenerated sudoku\n")
     sudoku_print(sys.stdout, sudoku)
+    file = open("generated_sudoku.txt", "w")
+    sudoku_print(file, sudoku)
+    file.close()
+    print("\nSudoku saved in generated_sudoku.txt")

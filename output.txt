@@ -1,0 +1,26 @@
+Results for sudokub.py
+Tested on MacBook Pro 2019 Intel i5
+
+### 9x9 ###
+Correct: 100
+Wrong: 0
+Average time: 0.18931124210357667 seconds
+Standard deviation: 0.006675768769675175 seconds
+Maximum time: 0.20387506484985352 seconds
+Minimum time: 0.16701102256774902 seconds
+
+### 16x16 ###
+Correct: 10
+Wrong: 0
+Average time: 0.49088666439056394 seconds
+Standard deviation: 0.013677262804238914 seconds
+Maximum time: 0.5232222080230713 seconds
+Minimum time: 0.4730257987976074 seconds
+
+### 25x25 ###
+Correct: 4
+Wrong: 0
+Average time: 2.1151649951934814 seconds
+Standard deviation: 0.07362865578439146 seconds
+Maximum time: 2.225461721420288 seconds
+Minimum time: 2.01814603805542 seconds
