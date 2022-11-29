@@ -4,23 +4,23 @@ Tested on MacBook Pro 2019 Intel i5
 ### 9x9 ###
 Correct: 100
 Wrong: 0
-Average time: 0.18931124210357667 seconds
-Standard deviation: 0.006675768769675175 seconds
-Maximum time: 0.20387506484985352 seconds
-Minimum time: 0.16701102256774902 seconds
+Average time: 0.18341567039489745 seconds
+Standard deviation: 0.005475889071822948 seconds
+Maximum time: 0.19770598411560059 seconds
+Minimum time: 0.16105318069458008 seconds
 
 ### 16x16 ###
 Correct: 10
 Wrong: 0
-Average time: 0.49088666439056394 seconds
-Standard deviation: 0.013677262804238914 seconds
-Maximum time: 0.5232222080230713 seconds
-Minimum time: 0.4730257987976074 seconds
+Average time: 0.4765810966491699 seconds
+Standard deviation: 0.017090488364404396 seconds
+Maximum time: 0.5182609558105469 seconds
+Minimum time: 0.4569358825683594 seconds
 
 ### 25x25 ###
 Correct: 4
 Wrong: 0
-Average time: 2.1151649951934814 seconds
-Standard deviation: 0.07362865578439146 seconds
-Maximum time: 2.225461721420288 seconds
-Minimum time: 2.01814603805542 seconds
+Average time: 2.08942711353302 seconds
+Standard deviation: 0.08140630936637964 seconds
+Maximum time: 2.2260632514953613 seconds
+Minimum time: 2.02602219581604 seconds

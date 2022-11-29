@@ -2,6 +2,7 @@
 
 import time
 import numpy as np
+import matplotlib.pyplot as plt
 import sys
 import subprocess
 from random import random
@@ -304,7 +305,7 @@ if __name__ == "__main__":
     save = open("output.txt", "w")
     save.write("Results for sudokub.py\n")
     save.write("Tested on MacBook Pro 2019 Intel i5\n")
-    times = np.zeros(100)
+    times_9 = np.zeros(100)
     correct = 0
     wrong = 0
 
@@ -327,7 +328,7 @@ if __name__ == "__main__":
 
         # stop chrono
         end = time.time()
-        times[i] = end - start
+        times_9[i] = end - start
 
         if sudoku == check:
             #print("\033[92m" + "Sudoku " + str(i).zfill(2) + " is correct in " + str(times[i]) + " seconds" + "\033[0m")
@@ -339,13 +340,19 @@ if __name__ == "__main__":
     save.write("\n### 9x9 ###\n")
     save.write("Correct: " + str(correct) + "\n")
     save.write("Wrong: " + str(wrong) + "\n")
-    save.write("Average time: " + str(np.mean(times)) + " seconds" + "\n")
-    save.write("Standard deviation: " + str(np.std(times)) + " seconds" + "\n")
-    save.write("Maximum time: " + str(np.max(times)) + " seconds" + "\n")
-    save.write("Minimum time: " + str(np.min(times)) + " seconds" + "\n")
+    save.write("Average time: " + str(np.mean(times_9)) + " seconds" + "\n")
+    save.write("Standard deviation: " + str(np.std(times_9)) + " seconds" + "\n")
+    save.write("Maximum time: " + str(np.max(times_9)) + " seconds" + "\n")
+    save.write("Minimum time: " + str(np.min(times_9)) + " seconds" + "\n")
 
+    # plot boxplot for times_9
+    plt.figure()
+    plt.boxplot(times_9)
+    plt.title("Boxplot for 9x9 sudokus")
+    plt.ylabel("Time (s)")
+    plt.savefig("report/figs/boxplot_9.png")
 
-    times = np.zeros(10)
+    times_16 = np.zeros(10)
     correct = 0
     wrong = 0
 
@@ -368,7 +375,7 @@ if __name__ == "__main__":
 
         # stop chrono
         end = time.time()
-        times[i] = end - start
+        times_16[i] = end - start
 
         if sudoku == check:
             #print("\033[92m" + "Sudoku " + str(i).zfill(2) + " is correct in " + str(times[i]) + " seconds" + "\033[0m")
@@ -380,11 +387,19 @@ if __name__ == "__main__":
     save.write("\n### 16x16 ###\n")
     save.write("Correct: " + str(correct) + "\n")
     save.write("Wrong: " + str(wrong) + "\n")
-    save.write("Average time: " + str(np.mean(times)) + " seconds" + "\n")
-    save.write("Standard deviation: " + str(np.std(times)) + " seconds" + "\n")
-    save.write("Maximum time: " + str(np.max(times)) + " seconds" + "\n")
-    save.write("Minimum time: " + str(np.min(times)) + " seconds" + "\n")
-    times = np.zeros(4)
+    save.write("Average time: " + str(np.mean(times_16)) + " seconds" + "\n")
+    save.write("Standard deviation: " + str(np.std(times_16)) + " seconds" + "\n")
+    save.write("Maximum time: " + str(np.max(times_16)) + " seconds" + "\n")
+    save.write("Minimum time: " + str(np.min(times_16)) + " seconds" + "\n")
+    
+    # plot boxplot for times_16
+    plt.figure()
+    plt.boxplot(times_16)
+    plt.title("Boxplot for 16x16 sudokus")
+    plt.ylabel("Time (s)")
+    plt.savefig("report/figs/boxplot_16.png")
+    
+    times_25 = np.zeros(4)
     correct = 0
     wrong = 0
 
@@ -407,7 +422,7 @@ if __name__ == "__main__":
 
         # stop chrono
         end = time.time()
-        times[i] = end - start
+        times_25[i] = end - start
 
         if sudoku == check:
             #print("\033[92m" + "Sudoku " + str(i).zfill(2) + " is correct in " + str(times[i]) + " seconds" + "\033[0m")
@@ -419,9 +434,20 @@ if __name__ == "__main__":
     save.write("\n### 25x25 ###\n")
     save.write("Correct: " + str(correct) + "\n")
     save.write("Wrong: " + str(wrong) + "\n")
-    save.write("Average time: " + str(np.mean(times)) + " seconds" + "\n")
-    save.write("Standard deviation: " + str(np.std(times)) + " seconds" + "\n")
-    save.write("Maximum time: " + str(np.max(times)) + " seconds" + "\n")
-    save.write("Minimum time: " + str(np.min(times)) + " seconds" + "\n")
+    save.write("Average time: " + str(np.mean(times_25)) + " seconds" + "\n")
+    save.write("Standard deviation: " + str(np.std(times_25)) + " seconds" + "\n")
+    save.write("Maximum time: " + str(np.max(times_25)) + " seconds" + "\n")
+    save.write("Minimum time: " + str(np.min(times_25)) + " seconds" + "\n")
 
     save.close()
+
+    # plot boxplot for times_25
+    plt.figure()
+    plt.boxplot(times_25)
+    plt.title("Boxplot for 25x25 sudokus")
+    plt.ylabel("Time (s)")
+    plt.savefig("report/figs/boxplot_25.png")
+
+
+
+    

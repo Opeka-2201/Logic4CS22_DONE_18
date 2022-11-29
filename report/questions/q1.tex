@@ -1,0 +1,34 @@
+\section{Encoding to SAT}
+\subsection{Solving sudokus}
+To solve the sudokus, one can encode the problem as a SAT problem and use a SAT solver like SAT4J to solve it. 
+For this project, the choosen encoding for the element at the line $i$ and column $j$ of a size-$N$ sudoku with the value $k$ (filled with leading zeros to have length equal to 2) is the following:
+$$ \text{variable} = (i \times N + j) \times 100 + k $$
+To create the clauses, two functions were implemented: \verb|newlit(i,j,k,N)| and \verb|newneglit(i,j,k,N)|. The first one creates a new literal with the value of the variable described above and the second one creates a new literal with the negation of the variable described above.
+
+To solve the sudoku, 8 rules were implemented by looping in a correct way to create the clauses:
+
+\begin{itemize}
+  \item Each cell contains at least number between 1 and $N$.
+  \item Each cell contains at most one number between 1 and $N$.
+  \item Each line contains every number once.
+  \item For each line, every number appears at most once.
+  \item Each column contains every number once.
+  \item For each column, every number appears at most once.
+  \item Each block contains every number once.
+  \item For each block, every number appears at most once.
+\end{itemize}
+
+\subsection{Checking sudokus uniqueness}
+Once that one can solve a sudoku with the SAT solver, it is straightforward to check if the sudoku has a unique solution. Indeed, simply giving back the same input to the SAT solver won't do the trick as it is deterministic.
+One can simply add a line to the clauses that forbids the solution found by the SAT solver to be the solution of the sudoku. If the SAT solver finds another solution, the the sudoku is not unique. If the SAT solver doesn't find any solution, the sudoku is unique.
+This technique is simply implemented in the function \verb|sudoku_other_solution_constraints| by looping on the solution found by the SAT solver with \verb|newneglit|.
+
+\subsection{Creating sudokus}
+\subsubsection{Creation with all numbers}
+To create the sudoku, one can simply begin by a blank sudoku and creating some kind of random seed for the SAT solver by placing randomly each number once in the sudoku, thus leading to no incoherence.
+From that random seed, one can use the SAT solver to find a solution and from that solution, one can remove a number at a time by checking everytime that the sudoku is still solvable and unique. If not, the removed number is reintroduced in the sudoku.
+This technique was implemented in the function \verb|sudoku_generate|. Once the function finds a sudoku that is solvable and unique, it returns it and saves it in a file called \verb|generated_sudoku.txt|.
+
+\subsubsection{Creation with only 8 numbers}
+To create a sudoku with only 8 numbers, one can simply implement the technique formulated above but before the removing phase of the protocol begins, all the clues for a certain value are removed. Then the looping starts and as previously, once the function finds a solvable and unique sudoku, 
+it returns it and saves it in a file called \verb|generated_sudoku.txt|. This technique was implemented in the function \verb|sudoku_generate| and by passing the value \verb|True| to the argument \verb|cm|.

@@ -1,0 +1,30 @@
+\newpage
+\section{Results obtained by the solver}
+
+The results of my implementation of the sudoku solver are presented in the table below. 
+The commputation was done on a MacBook Pro 2020 with a 1.4 GHz Quad-Core Intel Core i5 and 8 Go of 2133 MHz LPDDR3 RAM.
+
+\begin{table}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|}
+  \hline
+  Size & 9x9     & 16x16   & 25x25   \\ \hline
+  Mean & 0.1834s & 0.4765s & 2.0894s \\ \hline
+  Std  & 0.0054s & 0.0170s & 0.0814s  \\ \hline
+  Max  & 0.1977s & 0.5182s & 2.2260s \\ \hline
+  Min  & 0.1610s & 0.4569s & 2.0260s \\ \hline
+  \end{tabular}
+  \caption{Solving times of the SAT solver}
+  \label{tab:results}
+\end{table}
+
+% include all boxplot_9x9.png, boxplot_16x16.png and boxplot_25x25.png
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.33\textwidth]{figs/boxplot_9.png}
+  \includegraphics[width=0.33\textwidth]{figs/boxplot_16.png}
+  \includegraphics[width=0.33\textwidth]{figs/boxplot_25.png}
+  \caption{Boxplot of the solving times of the SAT solver}
+  \label{fig:boxplot}
+\end{figure}
+
